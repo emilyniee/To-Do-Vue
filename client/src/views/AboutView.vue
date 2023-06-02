@@ -1,11 +1,11 @@
 <template>
   <div class="about">
-    <h1>This is a todo app, pretty self explanatory.</h1>
+    <h1 class="abouttext">This is a todo app, pretty self explanatory.</h1>
   </div>
 </template>
 
 <style>
-h1{
+.abouttext {
     font-size: 16px;
     margin: 16px;
     height: 80vh;
