@@ -12,10 +12,12 @@ import { onMounted } from 'vue';
     data (){
       return {
         toDoList: [],
-        completedToDoList: [],
+        notCompletedToDoList: [],
 
         taskTitle: "",
         isCompleted: false,
+
+        showComplete: true
       }
     },
 
@@ -46,7 +48,7 @@ import { onMounted } from 'vue';
         });
 
         this.toDoList = this.toDoList.filter(todo => todo.id != i);
-        this.completedToDoList = this.toDoList.filter(todo => todo.is_completed == true);
+        this.notCompletedToDoList = this.toDoList.filter(todo => todo.is_completed == false);
       },
 
       async completeToDo(i){
@@ -60,14 +62,14 @@ import { onMounted } from 'vue';
           body: JSON.stringify(body)
         });
 
-        this.completedToDoList = this.toDoList.filter(todo => todo.is_completed == true);
-        console.log(this.completedToDoList);
+        this.notCompletedToDoList = this.toDoList.filter(todo => todo.is_completed == false);
       }
 
     },
 
-    mounted() {
-      this.getToDo();
+    async created() {
+      await this.getToDo();
+      this.notCompletedToDoList = this.toDoList.filter(todo => todo.is_completed == false);
     }
   }
 </script>
@@ -84,8 +86,8 @@ import { onMounted } from 'vue';
       />
       
         <h1 v-if="toDoList.length == 0" class="blank-page"> nothing to do!</h1>
-      
-        <ToDo 
+        
+        <ToDo v-if="showComplete == true"
           v-for="(toDo, i) in toDoList"
           :key="toDo.id"
           :title="toDo.description"
@@ -93,11 +95,29 @@ import { onMounted } from 'vue';
           @delete-to-do="deleteToDo(toDo.id)"
           @complete-to-do="completeToDo(toDo.id)"
         />
+
+        <ToDo v-if="showComplete == false"
+          v-for="(toDo, i) in notCompletedToDoList"
+          :key="toDo.id"
+          :title="toDo.description"
+          :isCompleted="toDo.is_completed"
+          @delete-to-do="deleteToDo(toDo.id)"
+          @complete-to-do="completeToDo(toDo.id)"
+        />
+
+        <button v-if="showComplete && toDoList.length != 0" :onclick="() => showComplete= !showComplete">
+            hide completed
+        </button>
+
+        <button v-if="showComplete == false && toDoList.length != 0"  :onclick="() => showComplete= !showComplete">
+            show completed
+        </button>
+
     </div>
 
     <div class="column-2">
       <Sidebar 
-        :tasks-completed=completedToDoList.length
+        :tasks-completed=toDoList.length-notCompletedToDoList.length
         :tasks-total=toDoList.length
       />
     </div>
@@ -113,7 +133,6 @@ import { onMounted } from 'vue';
     padding: 5px 16px;
     margin: 16px;
     margin-bottom: 0;
-
   }
 
   main {
@@ -143,4 +162,15 @@ import { onMounted } from 'vue';
     color: var(--grey);
   }
 
+  button {
+    width: 90%;
+    border-width: 0;
+    padding: 5px 16px;
+    margin: 16px;
+    margin-bottom: 0;
+  }
+
+  button:hover {
+    background-color: rgb(192, 192, 192)
+  }
 </style>
