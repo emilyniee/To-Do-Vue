@@ -21,27 +21,33 @@
     },
 
     methods: {
-      addToDo() {
-        this.toDoList.push({ title: this.taskTitle, isCompleted: this.isCompleted})
-        this.tasksTotal++;
+
+      async getToDo() {
+        const response = await fetch("http://localhost:3000/todos");
+        const data = await response.json();
+        this.toDoList = data;
       },
 
-      deleteToDo(i){
-        if (this.toDoList[i].isCompleted==true) {
-          this.tasksCompleted--;
-        } 
-        
-        this.tasksTotal--;
-        this.toDoList.splice(i, 1);
+      async addToDo() {
+        const body = {description: this.taskTitle, is_completed: this.isCompleted}
+
+        const response = await fetch("http://localhost:3000/todos", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(body)
+        });
+
+        window.location="/";
+
+      },
+
+      async deleteToDo(i){
+        const response = await fetch(`http://localhost:3000/todos/${i}`, {
+          method: "DELETE"
+        });
       },
 
       completeToDo(i){
-        if (this.toDoList[i].isCompleted==false) {
-          this.tasksCompleted++;
-        } else {
-          this.tasksCompleted--;
-        }
-        
         this.toDoList[i].isCompleted= !this.toDoList[i].isCompleted
       }
 
@@ -64,11 +70,11 @@
       
         <ToDo 
           v-for="(toDo, i) in toDoList"
-          :key="i"
-          :title="toDo.title"
-          :isCompleted="toDo.isCompleted"
-          @delete-to-do="deleteToDo(i)"
-          @complete-to-do="completeToDo(i)"
+          :key="toDo.id"
+          :title="toDo.description"
+          :isCompleted="toDo.is_completed"
+          @delete-to-do="deleteToDo(toDo.id)"
+          @complete-to-do="completeToDo(toDo.id)"
         />
     </div>
 
@@ -78,6 +84,10 @@
         :tasks-total=tasksTotal
       />
     </div>
+    
+    <button :onclick="getToDo">
+      get todos
+    </button>
 
   </main>
 </template>

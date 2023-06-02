@@ -1,12 +1,17 @@
 <script>
+    import { GChart } from 'vue-google-charts'
+
     export default {
-        props: ['tasks-completed', 'tasks-total'],
+        props: {
+            tasksCompleted: Number,
+            tasksTotal: Number,
+        },
 
         data(){
             return {
                 hours: null,
                 minutes: null,
-                seconds: null
+                seconds: null,
             }
         },
 
@@ -19,23 +24,19 @@
                 this.hours = 24- hours;
                 this.minutes = 60 - minutes;
                 this.seconds = 60 - seconds;
-            }
-        },
-        
-
-        computed: {
-            styles() {
-                return {
-                    fontSize: this.tasksCompleted + 'px'
-                    
-                }
             },
         },
 
-        created() {
-            this.setTime();
-            setInterval(this.setTime, 1000);
+        components: {
+            GChart
         },
+        
+        mounted:
+            function() {
+                this.setTime();
+                setInterval(this.setTime, 1000);
+            },
+        
   }
 
 </script>
@@ -52,7 +53,6 @@
             left of the day
         </div>
     </div>
-    <h1 :style="styles">hi </h1>
 </template>
 
 
@@ -60,7 +60,7 @@
 <style lang="css" scoped>
     .container {
         height: 100%;
-        background-color: pink;
+        background-color: var(--red);
         font-size: 16px;
         height: 100vh;
         display: flex;
