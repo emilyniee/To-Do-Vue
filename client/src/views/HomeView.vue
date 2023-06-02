@@ -1,6 +1,7 @@
 <script>
   import ToDo from '../components/ToDo.vue';
   import Sidebar from "../components/Sidebar.vue"
+import { onMounted } from 'vue';
 
   export default {
     components: {
@@ -11,12 +12,10 @@
     data (){
       return {
         toDoList: [],
+        completedToDoList: [],
 
         taskTitle: "",
         isCompleted: false,
-
-        tasksCompleted: 0,
-        tasksTotal: 0
       }
     },
 
@@ -45,12 +44,30 @@
         const response = await fetch(`http://localhost:3000/todos/${i}`, {
           method: "DELETE"
         });
+
+        this.toDoList = this.toDoList.filter(todo => todo.id != i);
+        this.completedToDoList = this.toDoList.filter(todo => todo.is_completed == true);
       },
 
-      completeToDo(i){
-        this.toDoList[i].isCompleted= !this.toDoList[i].isCompleted
+      async completeToDo(i){
+        const currentCompletion = this.toDoList.find(item => item.id == i).is_completed;
+        this.toDoList.find(item => item.id == i).is_completed = !currentCompletion;
+        const body = {is_completed: !currentCompletion}
+
+        const response = await fetch(`http://localhost:3000/todos/${i}`, {
+          method: "PUT",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(body)
+        });
+
+        this.completedToDoList = this.toDoList.filter(todo => todo.is_completed == true);
+        console.log(this.completedToDoList);
       }
 
+    },
+
+    mounted() {
+      this.getToDo();
     }
   }
 </script>
@@ -66,7 +83,7 @@
         placeholder="add a to do!"
       />
       
-        <h1 v-if="tasksTotal == 0" class="blank-page"> nothing to do!</h1>
+        <h1 v-if="toDoList.length == 0" class="blank-page"> nothing to do!</h1>
       
         <ToDo 
           v-for="(toDo, i) in toDoList"
@@ -80,14 +97,10 @@
 
     <div class="column-2">
       <Sidebar 
-        :tasks-completed=tasksCompleted 
-        :tasks-total=tasksTotal
+        :tasks-completed=completedToDoList.length
+        :tasks-total=toDoList.length
       />
     </div>
-    
-    <button :onclick="getToDo">
-      get todos
-    </button>
 
   </main>
 </template>

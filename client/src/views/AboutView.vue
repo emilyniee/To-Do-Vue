@@ -1,10 +1,20 @@
 <template>
   <div class="about">
-    <h1>This is an about page</h1>
+    <h1>This is a todo app, pretty self explanatory.</h1>
   </div>
 </template>
 
 <style>
+h1{
+    font-size: 16px;
+    margin: 16px;
+    height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--grey);
+}
+
 @media (min-width: 1024px) {
   .about {
     min-height: 100vh;

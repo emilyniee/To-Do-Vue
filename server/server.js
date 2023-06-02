@@ -40,7 +40,6 @@ app.get("/todos/:id", async(req, res) => {
 // add a to do
 app.post("/todos", async(req, res) => {
     try {
-        console.log(req.body)
         const { description, is_completed } = req.body;
         const newToDo = await pool.query (
             "INSERT INTO todo (description, is_completed) VALUES($1,$2) RETURNING *",
@@ -57,10 +56,10 @@ app.post("/todos", async(req, res) => {
 app.put("/todos/:id", async(req, res) => {
     try {
         const {id} = req.params;
-        const { description, is_completed } = req.body;
+        const { is_completed } = req.body;
         const updateToDo = await pool.query (
-            "UPDATE todo SET (description, is_completed) = ($1, $2) WHERE id = $3",
-            [description, is_completed, id]
+            "UPDATE todo SET is_completed = $1 WHERE id = $2",
+            [is_completed, id]
         );
 
         res.json("to do was updated")
